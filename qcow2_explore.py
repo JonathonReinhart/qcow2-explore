@@ -34,7 +34,7 @@ def main():
         mountpoint = mkdtemp()
         try:
             # Mount the partition
-            check_call(['mount', partdev, mountpoint])
+            check_call(['mount', '-o', 'ro', partdev, mountpoint])
             try:
                 # Explore!
                 print '\nYou are now looking at the mounted partition.'
