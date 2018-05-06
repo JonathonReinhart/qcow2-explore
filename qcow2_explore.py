@@ -4,13 +4,16 @@ import os, os.path
 from subprocess import call, check_call
 from tempfile import mkdtemp
 
+if sys.version_info.major > 2:
+    raw_input = input
+
 def main():
     if os.geteuid() != 0:
-        print '{0}: Must be run as root'.format(APPNAME)
+        print('{0}: Must be run as root'.format(APPNAME))
         sys.exit(1)
 
     if len(sys.argv) < 2:
-        print 'Usage: {0} image.qcow2'.format(APPNAME)
+        print('Usage: {0} image.qcow2'.format(APPNAME))
         sys.exit(1)
 
     image_file = sys.argv[1]
@@ -37,12 +40,12 @@ def main():
             check_call(['mount', partdev, mountpoint])
             try:
                 # Explore!
-                print '\nYou are now looking at the mounted partition.'
-                print 'Press Ctrl+D to exit.'
+                print('\nYou are now looking at the mounted partition.')
+                print('Press Ctrl+D to exit.')
 
                 call(['/bin/bash'], cwd=mountpoint)
 
-                print 'Finished! Cleaning up...'
+                print('Finished! Cleaning up...')
 
             finally:
                 # Unmount the partition
