@@ -9,8 +9,18 @@ from tempfile import mkdtemp
 if sys.version_info.major > 2:
     raw_input = input
 
+def mount(device, mountpoint, readonly=False):
+    args = ['mount']
+    if readonly:
+        args += ['-o', 'ro']
+    args += [device, mountpoint]
+    check_call(args)
+
+
 def parse_args():
     ap = argparse.ArgumentParser()
+    ap.add_argument('-r', '--read-only', action='store_true',
+            help='Mount read-only')
     ap.add_argument('image',
             help='QCOW2 image to explore')
     return ap.parse_args()
@@ -47,7 +57,7 @@ def main():
         mountpoint = mkdtemp()
         try:
             # Mount the partition
-            check_call(['mount', '-o', 'ro', partdev, mountpoint])
+            mount(partdev, mountpoint, readonly=args.read_only)
             try:
                 # Explore!
                 print('\nYou are now looking at the mounted partition.')
