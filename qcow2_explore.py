@@ -2,22 +2,31 @@
 from __future__ import print_function
 import sys
 import os, os.path
+import argparse
 from subprocess import call, check_call
 from tempfile import mkdtemp
 
 if sys.version_info.major > 2:
     raw_input = input
 
+def parse_args():
+    ap = argparse.ArgumentParser()
+    ap.add_argument('image',
+            help='QCOW2 image to explore')
+    return ap.parse_args()
+
+
 def main():
     if os.geteuid() != 0:
         print('{0}: Must be run as root'.format(APPNAME))
         sys.exit(1)
 
-    if len(sys.argv) < 2:
-        print('Usage: {0} image.qcow2'.format(APPNAME))
+    args = parse_args()
+
+    if not os.path.isfile(args.image):
+        print("Error: {} does not exist".format(args.image))
         sys.exit(1)
 
-    image_file = sys.argv[1]
 
     # TODO: Automatially find a free device
     nbd_dev = "/dev/nbd0"
@@ -26,7 +35,7 @@ def main():
     check_call(['modprobe', 'nbd', 'maxpart=8'])
 
     # Connect the QCOW2 image as a network block device
-    check_call(['qemu-nbd', '--connect', nbd_dev, image_file])
+    check_call(['qemu-nbd', '--connect', nbd_dev, args.image])
     try:
         # Display the partition table to the user
         check_call(['fdisk', '-l', nbd_dev])
