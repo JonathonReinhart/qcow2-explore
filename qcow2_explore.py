@@ -45,7 +45,11 @@ def main():
     check_call(['modprobe', 'nbd', 'maxpart=8'])
 
     # Connect the QCOW2 image as a network block device
-    check_call(['qemu-nbd', '--connect', nbd_dev, args.image])
+    nbd_args = ['qemu-nbd', '--connect', nbd_dev]
+    if args.read_only:
+        nbd_args.append('--read-only')
+    nbd_args.append(args.image)
+    check_call(nbd_args)
     try:
         # Display the partition table to the user
         check_call(['fdisk', '-l', nbd_dev])
